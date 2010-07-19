@@ -1,0 +1,11 @@
+module Nix-Completions
+
+imports Nix-Completions.generated
+
+completions
+                                                                   
+  completion template  : "import " <path> 
+  completion template  : "inherit (" <e> ") " <i> ";"
+  completion template  : "inherit " <i> ";"
+  // completion template  : <name> " = import " <path> " {\n\t\n};"
+

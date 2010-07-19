@@ -1,0 +1,172 @@
+definition
+module Nix
+exports
+
+  sorts Expr 
+  
+  context-free start-symbols 
+    Expr
+    
+  context-free syntax
+    ID           -> Expr {cons("Var")} 
+    INT          -> Expr {cons("Int")}
+    URI          -> Expr {cons("Uri")}
+    PATH         -> Expr {cons("Path")}
+    
+    "(" Expr ")"  -> Expr {bracket}
+    "[" ExprList "]" -> Expr {cons("List")}
+    -> ExprList {cons("ExprNil")}
+    Expr ExprList -> ExprList {cons("ExprCons")}
+
+    "assert" Expr ";" Expr -> Expr {cons("Assert")}
+    "with" Expr ";" Expr   -> Expr {cons("With")}
+
+    "let" Bind* "in" Expr  -> Expr {cons("Let")}
+    "let" "{" Bind* "}"    -> Expr {cons("LetRec")}
+
+    "{" Bind* "}"          -> Expr {cons("AttributeSet")}
+    "rec" "{" Bind* "}"    -> Expr {cons("RecAttributeSet")}
+
+    {ID "."}+ "=" Expr ";" -> Bind {cons("Bind")}
+    
+    "inherit" ID+ ";"              -> Bind {cons("Inherit")}
+    "inherit" "(" Expr ")" ID+ ";" -> Bind {cons("InheritFrom")}
+    
+    Expr Expr                          -> Expr {cons("Call"), left, prefer}
+    ID ":" Expr                        -> Expr {cons("Function")}
+    "{" {Arg ","}+ "}" ":" Expr        -> Expr {cons("Function")}
+    ID "@" "{" {Arg ","}+ "}" ":" Expr -> Expr {cons("Function")}
+    "{" {Arg ","}+ "}" "@" ID ":" Expr -> Expr {cons("Function")}
+    
+    ID          -> Arg {cons("Arg")}
+    ID "?" Expr -> Arg {cons("ArgDefault")}
+    "..."       -> Arg {cons("ArgEllipsis")}
+    
+    Expr "." ID                       -> Expr {cons("Select")}
+    "if" Expr "then" Expr "else" Expr -> Expr {cons("If")}
+
+    StringSQ -> Expr
+    StringDQ -> Expr
+
+  syntax
+    "\"" StringDQPart* StringDQEnd               -> <StringDQ-CF> {cons("StringDQ") }
+    "${" <LAYOUT?-CF> <Expr-CF> <LAYOUT?-CF> "}" -> StringDQPart
+    <StringDQChars-LEX>                          -> StringDQPart
+    ~[\"\$\\]+                                   -> <StringDQChars-LEX>
+    <Dollar-LEX>                                 -> StringDQPart
+    <Backslash-LEX>                              -> StringDQPart
+
+    "\\\"" -> StringDQPart {cons("QDQuote")}
+    "\\$"  -> StringDQPart {cons("DQDollar")}
+    [\"]   -> <DQuote-LEX>
+    [\$]   -> <Dollar-LEX>
+    [\\]   -> <Backslash-LEX>
+    "\""   -> StringDQEnd
+    
+  lexical restrictions
+    StringDQEnd   -/- [\$]
+    StringDQChars -/- ~[\$\"\\]
+    DQuote        -/- [\"]
+    Dollar        -/- [\{]
+    Backslash     -/- [\\\$]
+
+  syntax
+    "''" StringSQPart*  StringSQEnd              -> <StringSQ-CF> {cons("StringSQ") }
+    "${" <LAYOUT?-CF> <Expr-CF> <LAYOUT?-CF> "}" -> StringSQPart
+    <StringSQChars-LEX>                          -> StringSQPart
+    ~[\'\$]+                                     -> <StringSQChars-LEX>
+    <Quote-LEX>                                  -> StringSQPart
+    <Dollar-LEX>                                 -> StringSQPart 
+
+    "\\'" -> StringSQPart {cons("QSQuote")}
+    "''$" -> StringSQPart {cons("QDollar")}
+    "''\\$" -> StringSQPart {cons("QDollar")}
+    [\'] -> <Quote-LEX>
+    [\$] -> <Dollar-LEX>
+    "''" -> StringSQEnd
+    
+  lexical restrictions
+    StringSQEnd   -/- [\$]
+    StringSQChars -/- ~[\$\']
+    Quote         -/- [\']
+
+  context-free syntax
+    Expr "==" Expr -> Expr {cons("Eq"), non-assoc}
+    Expr "!=" Expr -> Expr {cons("NEq"), non-assoc}
+
+    "!" Expr       -> Expr {cons("Not")}
+    Expr "&&" Expr -> Expr {cons("And"), right}
+    Expr "||" Expr -> Expr {cons("Or"), right}
+    Expr "->" Expr -> Expr {cons("Impl"), right}
+
+    Expr "//" Expr -> Expr {cons("Update"), right}
+    Expr "?" ID    -> Expr {cons("HasAttr")}
+    Expr "+" Expr  -> Expr {cons("Plus"), left}
+    Expr "++" Expr -> Expr {cons("Concat"), right}
+
+    
+  lexical syntax
+    [a-zA-Z\_][a-zA-Z0-9\_\']* -> ID
+    "-"? [0-9]+            -> INT
+    [a-zA-Z0-9\.\_\-\+]    -> PATHID
+    PATHID* ("/" PATHID+)+ -> PATH
+    [a-zA-Z] [a-zA-Z0-9\+\-\.]* ":" [a-zA-Z0-9\%\/\?\:\@\&\=\+\$\,\-\_\.\!\~\*\']+ -> URI
+
+    "rec" | "let" | "if" | "then" | "else" | "assert" | "with" | "inherit" -> ID {reject}
+
+    -> EOF
+
+  lexical restrictions
+  
+    %% Ensure greedy matching for lexicals
+    CommentChar -/- [\/]
+    INT         -/- [0-9]
+    ID          -/- [a-zA-Z0-9\_\']
+    PATH        -/- [a-zA-Z0-9\.\_\-\+\/]
+    URI         -/- [a-zA-Z0-9\%\/\?\:\@\&\=\+\$\,\-\_\.\!\~\*\']
+    
+    %% EOF may not be followed by any char
+    EOF           -/- ~[]
+    "rec" "let" "if" "then" "else" "assert" "with" "inherit" -/- [A-Za-z0-9\_\']
+    
+  lexical syntax
+  	
+    [\ \t\n]                         -> LAYOUT
+    "#" ~[\n\r]* ([\n\r] | EOF)      -> LAYOUT
+    "/*" (~[\*] | CommentChar)* "*/" -> LAYOUT
+    [\*]                             -> CommentChar
+
+  context-free restrictions
+  
+    %% Ensure greedy matching for comments
+    LAYOUT? -/- [\ \t\n\r]
+    LAYOUT? -/- [\#]
+    LAYOUT? -/- [\/].[\*]
+
+ context-free priorities
+
+    Expr "." ID -> Expr
+  > Expr ExprList -> ExprList
+  > Expr Expr -> Expr
+  > Expr "?" ID -> Expr
+  > Expr "++" Expr -> Expr
+  > Expr "+" Expr -> Expr
+  > "!" Expr -> Expr
+  > Expr "//" Expr -> Expr
+  > { Expr "==" Expr -> Expr
+      Expr "!=" Expr -> Expr
+    }
+  > Expr "&&" Expr -> Expr
+  > Expr "||" Expr -> Expr
+  > Expr "->" Expr -> Expr
+  > {
+  	"with" Expr ";" Expr -> Expr
+    "let" Bind* "in" Expr  -> Expr
+    "if" Expr "then" Expr "else" Expr -> Expr
+    "assert" Expr ";" Expr -> Expr
+%%    } > {
+    ID ":" Expr                        -> Expr
+    "{" {Arg ","}+ "}" ":" Expr        -> Expr
+    ID "@" "{" {Arg ","}+ "}" ":" Expr -> Expr
+    "{" {Arg ","}+ "}" "@" ID ":" Expr -> Expr
+    }

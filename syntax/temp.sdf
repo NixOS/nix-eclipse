@@ -1,0 +1,39 @@
+    Expr Expr -> Expr {cons("Call"), left}
+    "let" "{" Bind* "}" -> Expr {cons("LetRec")}
+    "{" Bind* "}" -> Expr {cons("Attrs")}
+
+    Id "=" Expr ";" -> Bind {cons("Bind")}
+    "inherit" ("(" Expr ")")? Id* ";" -> Bind {cons("Inherit")}
+
+    "[" ExprList "]" -> Expr {cons("List")}
+    -> ExprList {cons("ExprNil")}
+    Expr ExprList -> ExprList {cons("ExprCons")}
+
+    Expr "." Id -> Expr {cons("Select")}
+
+
+    "if" Expr "then" Expr "else" Expr -> Expr {cons("If")}
+
+
+ context-free priorities
+
+    Expr "." Id -> Expr
+  > Expr ExprList -> ExprList
+  > Expr Expr -> Expr
+  > Expr "~" Expr -> Expr
+  > Expr "?" Id -> Expr
+  > Expr "++" Expr -> Expr
+  > Expr "+" Expr -> Expr
+  > "!" Expr -> Expr
+  > Expr "//" Expr -> Expr
+  > { Expr "==" Expr -> Expr
+      Expr "!=" Expr -> Expr
+    }
+  > Expr "&&" Expr -> Expr
+  > Expr "||" Expr -> Expr
+  > Expr "->" Expr -> Expr
+  > "if" Expr "then" Expr "else" Expr -> Expr
+  > "assert" Expr ";" Expr -> Expr
+  > "with" Expr ";" Expr -> Expr
+  > Id ":" Expr -> Expr
+  > "{" {Formal ","}* "}" ":" Expr -> Expr

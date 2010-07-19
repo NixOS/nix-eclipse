@@ -1,0 +1,151 @@
+[ sglri | error ] ./pkgs/lib/strings.nix: character '\' unexpected at line 83, column 49
+[ sglri | error ]   escape = list : string :
+[ sglri | error ]     stringAsChars (c: if lib.elem c list then "\\${c}" else c) string;
+[ sglri | error ]                                                 ^
+[ sglri | error ] ./pkgs/development/libraries/webkit/src-info-for-default.nix: character '\' unexpected at line 3, column 53
+[ sglri | error ]   downloadPage = "http://nightly.webkit.org/";
+[ sglri | error ]   versionExtractorSedScript = "s/.*-(r[0-9]+)[.].*/\\1/";
+[ sglri | error ]                                                     ^
+[ sglri | error ] ./pkgs/development/libraries/java/saxon/default8.nix: character '\' unexpected at line 18, column 46
+[ sglri | error ] export JAVA_HOME=${jre}
+[ sglri | error ] exec ${jre}/bin/java -jar $out/saxon8.jar \"\\$@\"
+[ sglri | error ]                                              ^
+[ sglri | error ] ./pkgs/development/libraries/libixp_for_wmii/default.nix: character '\' unexpected at line 7, column 47
+[ sglri | error ]      export LDFLAGS\=$(echo \$NIX_LDFLAGS | sed -e 's/-rpath/-L/g')
+[ sglri | error ]      sed -i -e \"s%^PREFIX.*%PREFIX=\$out%\" \\
+[ sglri | error ]                                               ^
+[ sglri | error ] ./pkgs/development/libraries/wxGTK-2.8/default.nix: character '}' unexpected at line 3, column 1
+[ sglri | error ] , mesa, compat24 ? false, compat26 ? true, unicode ? true,
+[ sglri | error ] }:
+[ sglri | error ] ^
+[ sglri | error ] ./pkgs/development/tools/misc/ctags/wrapped.nix: character '\' unexpected at line 41, column 39
+[ sglri | error ]     "--langmap=ActionScript:.as"
+[ sglri | error ]     "--regex-ActionScript=/function[ \\t]+([A-Za-z0-9_]+)[ \\t]*\\(/\1/f,function,functions/"
+[ sglri | error ]                                       ^
+[ sglri | error ] ./pkgs/development/compilers/fpc/default.nix: character '@' unexpected at line 20, column 41
+[ sglri | error ]     if system == "i686-linux" || system == "x86_64-linux" then ''
+[ sglri | error ]       sed -e "s@'/lib/ld-linux[^']*'@'''@" -i fpcsrc/compiler/systems/t_linux.pas
+[ sglri | error ]                                         ^
+[ sglri | error ] ./pkgs/development/compilers/sbcl/src-info-for-default.nix: character '\' unexpected at line 6, column 53
+[ sglri | error ]   sourceRegexp = "source[.-].*tar";
+[ sglri | error ]   versionExtractorSedScript = "s/.*-([0-9.rc]+)-.*/\\1/";
+[ sglri | error ]                                                     ^
+[ sglri | error ] ./pkgs/development/compilers/qi/9.1.nix: character '\' unexpected at line 25, column 75
+[ sglri | error ] 		shift
+[ sglri | error ] 		clisp -M '\$out'/share/Qi-9.1/lispinit.mem \$arg1 \"\$@\"\\n' > \$out/bin/qi
+[ sglri | error ]                                                                           ^
+[ sglri | error ] ./pkgs/development/compilers/ghc/6.8.2.nix: character '\' unexpected at line 32, column 18
+[ sglri | error ]     # still requires a hack for ncurses
+[ sglri | error ]     sed -i \"s|^\\\(ld-options.*$\\\)|\\\1 -L${ncurses}/lib|\" libraries/readline/readline.buildinfo.in
+[ sglri | error ]                  ^
+[ sglri | error ] ./pkgs/development/compilers/ghc/6.4.2-binary.nix: character '\' unexpected at line 34, column 32
+[ sglri | error ]   postBuild = if stdenv.isLinux then "
+[ sglri | error ]     find . -type f -perm +100 \\
+[ sglri | error ]                                ^
+[ sglri | error ] ./pkgs/servers/http/4store/src-info-for-default.nix: character '\' unexpected at line 5, column 54
+[ sglri | error ]   choiceCommand = "tail -n 1";
+[ sglri | error ]   versionExtractorSedScript = "s@.*-(v[0-9.]+)[.].*@\\1@";
+[ sglri | error ]                                                      ^
+[ sglri | error ] ./pkgs/servers/x11/xorg/default.nix: character ';' unexpected at line 18, column 19
+[ sglri | error ]     buildInputs = [pkgconfig ];
+[ sglri | error ]   })) // {inherit ;};
+[ sglri | error ]                   ^
+[ sglri | error ] ./pkgs/build-support/builder-defs/builder-defs.nix: character '\' unexpected at line 68, column 45
+[ sglri | error ]                         nestingLevel=\$((\$nestingLevel + 1))
+[ sglri | error ]                                 echo -en \"\\e[\$1p\"
+[ sglri | error ]                                             ^
+[ sglri | error ] ./pkgs/build-support/builder-defs/template-auto-callable.nix: character '(' unexpected at line 2, column 3
+[ sglri | error ] x@{builderDefsPackage
+[ sglri | error ]   (abort "Specify dependencies")
+[ sglri | error ]   ^
+[ sglri | error ] ./pkgs/build-support/builder-defs/template-composing-builder.nix: character ';' unexpected at line 11, column 46
+[ sglri | error ] rec {
+[ sglri | error ]   src = /* Here a fetchurl expression goes */;
+[ sglri | error ]                                              ^
+[ sglri | error ] ./pkgs/build-support/builder-defs/template-bdp-uud.nix: character '(' unexpected at line 21, column 25
+[ sglri | error ]     maintainers = [
+[ sglri | error ]       a.lib.maintainers.(abort "Specify maintainer")
+[ sglri | error ]                         ^
+[ sglri | error ] ./pkgs/desktops/gnome-2.28/default.nix: '1 ambiguous subsentences found': input sentence
+[ sglri | error ] ./pkgs/os-specific/linux/syslinux/default.nix: character '\' unexpected at line 17, column 45
+[ sglri | error ]     if test \"$system\" = x86_64-linux; then
+[ sglri | error ]         substituteInPlace memdisk/Makefile \\
+[ sglri | error ]                                             ^
+[ sglri | error ] ./pkgs/os-specific/linux/atheros/0.9.3.3.nix: character ';' unexpected at line 17, column 29
+[ sglri | error ] 			sha256 = "11xpx5g9w7ilagvj60prc3s8a3x0n5n4mr0b7nh0lxwrbjdgjjfg";
+[ sglri | error ] 		} else "")*/;
+[ sglri | error ]                             ^
+[ sglri | error ] ./pkgs/os-specific/linux/upstart/jobcontrol.nix: character '\' unexpected at line 9, column 53
+[ sglri | error ] 			shift
+[ sglri | error ] 			controlscript=\$(egrep exec\\|respawn \$file | tail | sed -e s/^\\\\s\\\\+//g  | sed -e s/\\\\s\\\\+/\\ /g | cut -f 2 -d \\  )
+[ sglri | error ]                                                     ^
+[ sglri | error ] ./pkgs/os-specific/windows/wxMSW-2.8/default.nix: character '}' unexpected at line 2, column 1
+[ sglri | error ] { stdenv, fetchurl, compat24 ? false, compat26 ? true, unicode ? true,
+[ sglri | error ] }:
+[ sglri | error ] ^
+[ sglri | error ] ./pkgs/applications/editors/jedit/default.nix: character '\' unexpected at line 13, column 17
+[ sglri | error ]   buildPhase = "
+[ sglri | error ]      sed -i 's/\\<SplashScreen\\>/org.gjt.sp.jedit.gui.SplashScreen/g' org/gjt/sp/jedit/GUIUtilities.java
+[ sglri | error ]                 ^
+[ sglri | error ] ./pkgs/applications/editors/jedit/wrapper.nix: character '\' unexpected at line 14, column 28
+[ sglri | error ] #!/bin/sh
+[ sglri | error ] exec $java -jar $jeditjar \\$*
+[ sglri | error ]                            ^
+[ sglri | error ] ./pkgs/applications/window-managers/wmii/default.nix: character '\' unexpected at line 22, column 47
+[ sglri | error ]      export LDFLAGS\=$(echo \$NIX_LDFLAGS | sed -e 's/-rpath/-L/g')
+[ sglri | error ]      sed -i -e \"s%^PREFIX.*%PREFIX=\$out%\" \\
+[ sglri | error ]                                               ^
+[ sglri | error ] ./pkgs/applications/window-managers/wmii31/default.nix: character '\' unexpected at line 17, column 47
+[ sglri | error ]      export LDFLAGS\=$(echo \$NIX_LDFLAGS | sed -e 's/-rpath/-L/g')
+[ sglri | error ]      sed -i -e \"s%^PREFIX.*%PREFIX=\$out%\" \\
+[ sglri | error ]                                               ^
+[ sglri | error ] ./pkgs/applications/office/openoffice/get-go-src.nix: character '/' unexpected at line 30, column 41
+[ sglri | error ]   makesh = ''
+[ sglri | error ]     sed -i -e '/-x $WG/d' -e "s/WGET='''/WGET='echo XXX'/" download
+[ sglri | error ]                                         ^
+[ sglri | error ] ./pkgs/applications/graphics/xara/default.nix: character '\' unexpected at line 26, column 21
+[ sglri | error ] LD_LIBRARY_PATH=\$freetype/lib:\$libpng/lib:\$libjpeg/lib:\$libxml2/lib:
+[ sglri | error ] \$out/lib/XaraLX \"\\$@\"
+[ sglri | error ]                     ^
+[ sglri | error ] ./pkgs/applications/graphics/graphicsmagick/default.nix: '1 ambiguous subsentences found': input sentence
+[ sglri | error ] ./pkgs/applications/graphics/graphicsmagick/1.3.7.nix: '1 ambiguous subsentences found': input sentence
+[ sglri | error ] ./pkgs/applications/virtualization/virtualbox/default.nix: character '\' unexpected at line 19, column 67
+[ sglri | error ]     MODULES_BUILD_DIR=`echo ${kernel}/lib/modules/*/build`
+[ sglri | error ]     sed -e 's@/lib/modules/`uname -r`/build@'$MODULES_BUILD_DIR@ \\
+[ sglri | error ]                                                                   ^
+[ sglri | error ] ./pkgs/applications/misc/xpdf/default.nix: character '\' unexpected at line 51, column 42
+[ sglri | error ]     if test -n \"${base14Fonts}\"; then
+[ sglri | error ]       substituteInPlace $out/etc/xpdfrc \\
+[ sglri | error ]                                          ^
+[ sglri | error ] ./pkgs/applications/misc/i810/default.nix: character '\' unexpected at line 8, column 20
+[ sglri | error ]     sed -i -e 's+/usr++' Makefile
+[ sglri | error ]     sed -i -e 's+^\\(.*putenv(\"PATH=\\).*$+\\1${pciutils}/sbin\");+' i810switch.c
+[ sglri | error ]                    ^
+[ sglri | error ] ./pkgs/applications/networking/instant-messengers/carrier/2.4.2.nix: character ')' unexpected at line 8, column 63
+[ sglri | error ] let 
+[ sglri | error ]   externalPurple2 = lib.attrByPath ["purple2Source"] null args) != null; 
+[ sglri | error ]                                                               ^
+[ sglri | error ] ./pkgs/applications/networking/browsers/firefox/binary.nix: character '\' unexpected at line 39, column 31
+[ sglri | error ]     sed -e 's@moz_libdir=.*@moz_libdir='\$out'/firefox/@' -i \$out/bin/firefox 
+[ sglri | error ]     sed -e 's@moz_libdir=.*@&\\nexport PATH=\$PATH:${coreutils}/bin@' -i \$out/bin/firefox 
+[ sglri | error ]                               ^
+[ sglri | error ] ./pkgs/applications/networking/sniffers/kismet/default.nix: character '\' unexpected at line 13, column 35
+[ sglri | error ]   postConfigure =
+[ sglri | error ]     "sed -e 's@-o \$(INSTUSR)@@' \\
+[ sglri | error ]                                   ^
+[ sglri | error ] ./pkgs/tools/filesystems/relfs/default.nix: character '\' unexpected at line 20, column 40
+[ sglri | error ] 			cd ../src
+[ sglri | error ] 			sed -e 's/NULL\\|FALSE/0/g' -i Mimetype_lib.c
+[ sglri | error ]                                        ^
+[ sglri | error ] ./pkgs/tools/misc/eProver/default.nix: character '\' unexpected at line 14, column 39
+[ sglri | error ] 
+[ sglri | error ]   preConfigure = "sed -e 's@^EXECPATH\\s.*@EXECPATH = '\$out'/bin@' -i Makefile.vars";
+[ sglri | error ]                                       ^
+[ sglri | error ] ./pkgs/tools/networking/ssmtp/default.nix: character '\' unexpected at line 19, column 47
+[ sglri | error ]   postConfigure = "
+[ sglri | error ]     sed -e '/INSTALLED_CONFIGURATION_FILE/d' \\
+[ sglri | error ]                                               ^
+[ sglri | error ] ./pkgs/tools/X11/xlaunch/default.nix: character '\' unexpected at line 34, column 41
+[ sglri | error ] 		echo '#! ${stdenv.shell}
+[ sglri | error ] 			USER=\$(egrep '\\''^[-a-z0-9A-Z_]*:[^:]*:'\\''\$1'\\'':'\\'' /etc/passwd | sed -e '\\''s/:.*//'\\'' )
+[ sglri | error ]                                         ^

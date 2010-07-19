@@ -1,0 +1,10 @@
+module Nix-Colorer
+
+imports Nix-Colorer.generated
+
+colorer
+                                                                      
+  _.Arg         : _ italic
+  _.ArgDefault  : _ italic
+  _.ArgEllipses : _ italic
+         

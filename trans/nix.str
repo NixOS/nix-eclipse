@@ -1,0 +1,174 @@
+module nix
+
+imports
+  libstratego-lib
+  libstratego-gpp
+  libstratego-aterm
+  include/Nix
+  lib/editor-common.generated
+
+rules // Main editor interface (defined by editor/Nix-Builders and -References.esv)
+  
+  // Prints the abstract syntax ATerm of a selection.
+  generate-aterm:
+    (selected, position, ast, path, project-path) -> (filename, result)
+    with
+      filename := <guarantee-extension(|"aterm")> path;
+      result   := selected // we just return the input term
+
+
+rules // import resolving  
+  editor-resolve :
+    (Path(p), position, ast, path, project-path) -> <parse-file> file
+    with
+      file := <resolve-import-path(|path)> p
+
+  resolve-path(|basepath) =
+  	?p
+  ; if <is-abspath>p then 
+      	imp := p
+      else 
+        imp := <concat-strings> [ <abspath ; dirname>basepath, "/", p ] 
+      end 
+
+  resolve-import-path(|basepath) =
+  	resolve-path(|basepath)
+  ; if test-extension(id) then 
+      if not(file-exists) then
+        fatal-err-msg(|$[Cannot open file that does not exits.])
+      end
+    else 
+      <concat-strings>[<id>, "/default.nix"]
+    end    
+
+rules // analysis
+  editor-analyze :
+    (ast, path, project-path) -> (errors, warnings, [])
+    with
+      errors   := <collect-all(nix-error(|path), conc)> ast
+    ; warnings := <collect-all(nix-warning(|path), conc)> ast
+      
+  nix-warning(|path) :
+  	Path(p) -> (<id>, $[Path/file '[p]' does not exist.])
+    where
+      <resolve-path(|path)> p ; not(file-exists)
+
+  nix-warning(|path) :
+    Function(n, With(Var(n), _)) -> (<id>, $[The 'args: with args; e' construction is bad practise, please do not use!])
+
+  nix-warning(|path) :
+    Bind(["__noChroot"], _) -> (<id>, $[The use of '__noChroot' should be avoided at all costs, please do not use!])
+
+  nix-error(|path) = fail
+
+
+rules
+  generate-missing-file :
+    (selected@Path(p), position, ast, path, project-path) -> (relfile, contents)
+    where 
+      file := <resolve-import-path(|path)> p ;
+      if not( relfile := <make-project-relative-path(|project-path)> file ) then
+      	fatal-err-msg(|$[Cannot create a nix expression outside the workspace])
+      end ;
+      ( (name, allinputs) := <deconstruct-import-call(|position)>ast
+      ; if <elem>("stdenv", allinputs) ; <elem>("fetchurl", allinputs) then
+            inputs := <filter(not("stdenv"+"fetchurl"))> allinputs
+          ; contents := <mkDerivation-expression(|name, inputs)>
+        else
+          fail
+        end
+      <+ contents := <not-implemented-expression>
+      )
+    ; <queue-analysis> path
+
+  make-project-relative-path(|project-path) =
+  	<concat-strings>["./", <str-left-match>(<id>, project-path)]
+
+  deconstruct-import-call(|position) =
+  	parent-at-position(|<repeat(remove-last|2)>position) ; deconstruct-bind-import-call 
+ 	<+ parent-at-position(|<repeat(remove-last|1)>position) ; deconstruct-import-call
+
+  deconstruct-bind-import-call :
+      Bind([name], Call(Call(Var("import"), Path(_)), AttributeSet(as))) -> (name, inputs)
+      where
+          <filter(?Inherit(<id>) + ?InheritFrom(_,<id>))>as ;
+          concat => inputs  
+          
+  deconstruct-import-call :
+      Call(Call(Var("import"), Path(_)), AttributeSet(as)) -> ("", inputs)
+      where
+          <filter(?Inherit(<id>) + ?InheritFrom(_,<id>))>as ;
+          concat => inputs  
+
+  remove-last =
+    split-last => (<id>, _)
+    
+  generate-missing-file :
+    (selected, position, ast, path, project-path) -> <generate-missing-file> (parent, <remove-last>position, ast, path, project-path)
+    where <is-string> selected; parent := <parent-at-position(|position)> ast
+
+  not-implemented-expression = !$[
+    abort "not yet implemented"
+  ] 
+  
+  mkDerivation-expression(|name, inputs) = !$<
+    { stdenv
+    , fetchurl
+    < <map(<concat-strings>[", ", <id>])>inputs >
+    }:
+    stdenv.mkDerivation {
+      name = "<name>";
+      src = fetchurl {
+        url = http://someplace.com ;
+        sha256 = "";  			
+      };
+      buildInputs = [< <separate-by(!" ")>inputs >] ;
+      meta = {
+        description = "";
+        longDescription = ''
+        '';
+        # homepage = http://someplace.com/;
+        # license = "GPLv2";
+      };
+    }
+  >
+  
+  
+strategies // build expression / attribute
+
+  build-top-level : 
+    (selected, position, ast, path, project-path) -> None()
+    where
+        <nix-build>path
+      ; if not(0) then
+          fatal-err-msg(|$[Nix build on top-level expression failed.])  
+        end
+    
+  build-attribute = 
+    build-attribute-internal
+  <+ build-attribute-internal-rec
+        
+  build-attribute-internal : 
+    (Bind([name], _), position, ast, path, project-path) -> None()
+    where 
+        <nix-build(|name)>path
+      ; if not(0) then
+          fatal-err-msg(|$[Nix build on top-level expression failed.])  
+        end
+          
+  build-attribute-internal-rec :
+    (selected, position, ast, path, project-path) -> <build-attribute> (parent, <remove-last> position, ast, path, project-path)
+    where parent := <parent-at-position(|position)> ast
+
+  nix-build =
+    <call>("nix-build", [<id>])
+    
+  nix-build(|attribute) =
+    <call>("nix-build", [<id>, "-A", attribute])
+
+strategies // helper functions
+
+  str-left-match = 
+    (explode-string, explode-string) ; left-match ; implode-string
+    
+

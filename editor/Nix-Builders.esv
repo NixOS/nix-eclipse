@@ -1,0 +1,22 @@
+
+module Nix-Builders
+
+imports Nix-Builders.generated
+
+builders
+                                                                      
+  // This file can be used for custom analysis and builder rules.     
+  //                                                                  
+  // See the imported file for a brief introduction and examples.     
+
+builders
+
+  observer : editor-analyze                                                          
+
+  provider : include/nix.ctree                                                       
+  
+  builder  : "Show abstract syntax" = generate-aterm (openeditor) (realtime) (meta)  
+  builder  : "Create missing file" = generate-missing-file (openeditor) (realtime) (cursor)
+  builder  : "Build attribute" = build-attribute (cursor) (realtime)  
+  builder  : "Build top-level" = build-top-level (cursor) (realtime)  
+                                                             
