@@ -9,13 +9,10 @@ imports
 
 rules // Main editor interface (defined by editor/Nix-Builders and -References.esv)
   
-  // Prints the abstract syntax ATerm of a selection.
   generate-aterm:
-    (selected, position, ast, path, project-path) -> (filename, result)
+    (selected, position, ast, path, project-path) -> (filename, selected)
     with
-      filename := <guarantee-extension(|"aterm")> path;
-      result   := selected // we just return the input term
-
+      filename := <guarantee-extension(|"aterm")> path
 
 rules // import resolving  
   editor-resolve :
@@ -33,10 +30,8 @@ rules // import resolving
 
   resolve-import-path(|basepath) =
   	resolve-path(|basepath)
-  ; if test-extension(id) then 
-      if not(file-exists) then
-        fatal-err-msg(|$[Cannot open file that does not exits.])
-      end
+  ; if test-extension("nix") then 
+      id
     else 
       <concat-strings>[<id>, "/default.nix"]
     end    
@@ -67,19 +62,24 @@ rules
     (selected@Path(p), position, ast, path, project-path) -> (relfile, contents)
     where 
       file := <resolve-import-path(|path)> p ;
+      if file-exists then
+      	 warn(|"File already exists.") ; fail
+      end;
+//      abspath := <dirname>file ;
+//      <mkdir-p>abspath ; 
       if not( relfile := <make-project-relative-path(|project-path)> file ) then
       	fatal-err-msg(|$[Cannot create a nix expression outside the workspace])
       end ;
-      ( (name, allinputs) := <deconstruct-import-call(|position)>ast
+      ( (name, allinputs) := <deconstruct-import-call(|position)>ast 
       ; if <elem>("stdenv", allinputs) ; <elem>("fetchurl", allinputs) then
-            inputs := <filter(not("stdenv"+"fetchurl"))> allinputs
-          ; contents := <mkDerivation-expression(|name, inputs)>
+            inputs := <filter(not("stdenv"+"fetchurl"))> allinputs 
+          ; contents := <mkDerivation-expression(|name, inputs)> 
         else
           fail
         end
       <+ contents := <not-implemented-expression>
       )
-    ; <queue-analysis> path
+    ; <queue-analysis> path 
 
   make-project-relative-path(|project-path) =
   	<concat-strings>["./", <str-left-match>(<id>, project-path)]
@@ -166,9 +166,24 @@ strategies // build expression / attribute
   nix-build(|attribute) =
     <call>("nix-build", [<id>, "-A", attribute])
 
+  nix-env-i(|attribute) =
+    <call>("nix-env", [<id>, "-iA", attribute])
+
 strategies // helper functions
 
   str-left-match = 
     (explode-string, explode-string) ; left-match ; implode-string
     
-
+  direxists = file-exists ; filemode ; isdir
+    
+  mkdir-p =
+    ?path;
+    if not(direxists) then
+      dirname => parent ; 
+      if not(direxists) then 
+        <mkdir-p>parent 
+      end ;
+      <mkdir>path
+    end
+    
+    

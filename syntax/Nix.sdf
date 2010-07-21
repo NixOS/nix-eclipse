@@ -15,9 +15,9 @@ exports
     PATH         -> Expr {cons("Path")}
     
     "(" Expr ")"  -> Expr {bracket}
-    "[" ExprList "]" -> Expr {cons("List")}
-    -> ExprList {cons("ExprNil")}
-    Expr ExprList -> ExprList {cons("ExprCons")}
+    "[" Expr* "]" -> Expr {cons("List")}
+%%    -> ExprList {cons("ExprNil")}
+%%    Expr ExprList -> ExprList {cons("ExprCons")}
 
     "assert" Expr ";" Expr -> Expr {cons("Assert")}
     "with" Expr ";" Expr   -> Expr {cons("With")}
@@ -147,7 +147,8 @@ exports
  context-free priorities
 
     Expr "." ID -> Expr
-  > Expr ExprList -> ExprList
+%%  > Expr ExprList -> ExprList
+  > "[" Expr* "]" -> Expr
   > Expr Expr -> Expr
   > Expr "?" ID -> Expr
   > Expr "++" Expr -> Expr
