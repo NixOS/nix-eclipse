@@ -63,10 +63,8 @@ rules
     where 
       file := <resolve-import-path(|path)> p ;
       if file-exists then
-      	 warn(|"File already exists.") ; fail
+      	 fatal-err-msg(|"File already exists.") 
       end;
-//      abspath := <dirname>file ;
-//      <mkdir-p>abspath ; 
       if not( relfile := <make-project-relative-path(|project-path)> file ) then
       	fatal-err-msg(|$[Cannot create a nix expression outside the workspace])
       end ;
