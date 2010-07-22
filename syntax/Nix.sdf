@@ -15,9 +15,9 @@ exports
     PATH         -> Expr {cons("Path")}
     
     "(" Expr ")"  -> Expr {bracket}
-    "[" Expr* "]" -> Expr {cons("List")}
-%%    -> ExprList {cons("ExprNil")}
-%%    Expr ExprList -> ExprList {cons("ExprCons")}
+    "[" ExprList "]" -> Expr {cons("List")}
+    -> ExprList {cons("ExprNil")}
+    Expr ExprList -> ExprList {cons("ExprCons")}
 
     "assert" Expr ";" Expr -> Expr {cons("Assert")}
     "with" Expr ";" Expr   -> Expr {cons("With")}
@@ -118,11 +118,11 @@ exports
     -> EOF
 
   lexical restrictions
-  
+    
     %% Ensure greedy matching for lexicals
     CommentChar -/- [\/]
     INT         -/- [0-9]
-    ID          -/- [a-zA-Z0-9\_\']
+    ID          -/- [a-zA-Z0-9\_\'\/]
     PATH        -/- [a-zA-Z0-9\.\_\-\+\/]
     URI         -/- [a-zA-Z0-9\%\/\?\:\@\&\=\+\$\,\-\_\.\!\~\*\']
     
@@ -147,8 +147,7 @@ exports
  context-free priorities
 
     Expr "." ID -> Expr
-%%  > Expr ExprList -> ExprList
-  > "[" Expr* "]" -> Expr
+  > Expr ExprList -> ExprList
   > Expr Expr -> Expr
   > Expr "?" ID -> Expr
   > Expr "++" Expr -> Expr
