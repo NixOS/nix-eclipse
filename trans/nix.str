@@ -40,8 +40,8 @@ rules // analysis
   editor-analyze :
     (ast, path, project-path) -> (errors, warnings, [])
     with
-      errors   := <collect-all(nix-error(|path), conc)> ast
-    ; warnings := <collect-all(nix-warning(|path), conc)> ast
+      errors   := <collect-all(nix-error(|path), conc)> ast; 
+      warnings := <collect-all(nix-warning(|path), conc)> ast
       
   nix-warning(|path) :
   	Path(p) -> (<id>, $[Path/file '[p]' does not exist.])
@@ -184,4 +184,26 @@ strategies // helper functions
       <mkdir>path
     end
     
+strategies
+  get-filename = 
+    string-tokenize-keep-empty(|['/']) ; last
+
     
+  editor-complete:
+    (node, position, ast, path, project-path) -> proposals
+    where 
+      proposals := <propose-completion(|path) <+ ![]> node
+
+
+  propose-completion(|path) :
+    Path(COMPLETION(s)) -> contents
+    where
+      file := <get-filename>s; 
+      dir := <concat-strings; dirname>[s, " "]; //dirty hack 
+      abspath := <resolve-path(|path)>dir; 
+      contents := < readdir 
+                  ; string-sort
+                  ; filter( where(<str-left-match>(<id>, file)) ; <concat-strings>[dir, "/", <id>] )
+                  >abspath 
+      
+        

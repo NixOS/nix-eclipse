@@ -3,6 +3,7 @@ module Nix-Completions
 imports Nix-Completions.generated
 
 completions
+  completion proposer : editor-complete
                                                                    
   completion template : "import " <path> 
   completion template : "inherit (" <e> ") " <i> ";"
