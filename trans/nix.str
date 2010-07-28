@@ -15,6 +15,14 @@ rules // Main editor interface (defined by editor/Nix-Builders and -References.e
       filename := <guarantee-extension(|"aterm")> path
 
 rules // import resolving  
+  editor-resolve :	
+	(selected, position, ast, path, project-path) -> target
+	where
+	  ast2 := <DecoratedAst>ast; 
+      target := <decl-of> <term-at-position(|position)>ast2  
+  
+  decl-of : Var(x) -> <VarDef>x		
+	
   editor-resolve :
     (Path(p), position, ast, path, project-path) -> <parse-file> file
     with
@@ -41,8 +49,78 @@ rules // analysis
     (ast, path, project-path) -> (errors, warnings, [])
     with
       errors   := <collect-all(nix-error(|path), conc)> ast; 
-      warnings := <collect-all(nix-warning(|path), conc)> ast
+      warnings := <collect-all(nix-warning(|path), conc)> ast;
+      ast1     := <declare-top>ast;
+      rules ( DecoratedAst : ast -> ast1 )
+          
+  declare-top =
+    rename-top
+    
+  rename-top =
+    alltd(rename)
+  
+  rename-bind : d@Bind([x],e) -> Bind([y],e)
+    where 
+      y := <rename-bind-int(|d)>x
+
+  rename-bind : d@Inherit(xs) -> Inherit(ys)
+    where
+      ys := < map(rename-bind-int(|d))>xs
+
+  rename-bind : d@InheritFrom(f, xs) -> InheritFrom(f, ys)
+    where
+      ys := < map(rename-bind-int(|d))>xs
+  
+  rename-bind : d@Arg(x) -> Arg(y)
+    where
+      y := <rename-bind-int(|d)>x
+            
+  rename-bind-int(|d) :
+    x -> y
+    where
+      y := x{<new>};
+      rules(
+        VarDef   : y -> d
+        RenameId : x -> y  
+      ) 
       
+  rename : Var(x) -> Var(y)
+    where y := <RenameId>x      
+      
+  rename : RecAttributeSet(bs1) -> RecAttributeSet(bs3)
+    where 
+      {| RenameId:
+      	bs2 := <map(try(rename-bind))>bs1;
+      	bs3 := <rename-top>bs2
+      |}
+      
+  rename : Let(bs1, e1) -> Let(bs3, e2) 
+    where 
+      {| RenameId:
+        bs2 := <map(try(rename-bind))>bs1;
+        bs3 := <rename-top>bs2;
+        e2 := <rename-top>e1
+      |}
+      
+  rename : d@Function(a1, e1) -> Function(a2, e2)
+    where 
+      {| RenameId:
+        <is-string>a1;
+        a2 := <rename-bind-int(|d)>a1;
+        e2 := <rename-top>e1
+      |}
+
+  rename : Function(as1, e1) -> Function(as2, e2)
+    where 
+      <is-list>as1;
+      {| RenameId:
+        as2 := <map(try(rename-bind))>as1;
+        as3 := <rename-top>as2;
+        e2 := <rename-top>e1
+      |}
+        
+
+        
   nix-warning(|path) :
   	Path(p) -> (<id>, $[Path/file '[p]' does not exist.])
     where
@@ -172,7 +250,7 @@ strategies // helper functions
   str-left-match = 
     (explode-string, explode-string) ; left-match ; implode-string
     
-  direxists = file-exists ; filemode ; isdir
+  direxists = where(file-exists ; filemode ; isdir)
     
   mkdir-p =
     ?path;
@@ -186,21 +264,27 @@ strategies // helper functions
     
 strategies
   get-filename = 
-    string-tokenize-keep-empty(|['/']) ; last
+    string-tokenize-keep-empty(|['/','\']) ; last
 
     
   editor-complete:
     (node, position, ast, path, project-path) -> proposals
     where 
-      proposals := <propose-completion(|path) <+ ![]> node
+      {| current-path, current-project-path: 
+	    rules( 
+	      current-path         := path
+	      current-project-path := project-path
+	    ) ;
+        proposals := <propose-completion <+ ![]> node
+      |}
 
 
-  propose-completion(|path) :
+  propose-completion :
     Path(COMPLETION(s)) -> contents
     where
       file := <get-filename>s; 
-      dir := <concat-strings; dirname>[s, " "]; //dirty hack 
-      abspath := <resolve-path(|path)>dir; 
+      dir := <concat-strings ; dirname>[s, " "]; //dirty hack 
+      abspath := <resolve-path(|<current-path>)>dir;
       contents := < readdir 
                   ; string-sort
                   ; filter( where(<str-left-match>(<id>, file)) ; <concat-strings>[dir, "/", <id>] )
