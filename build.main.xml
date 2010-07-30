@@ -37,5 +37,5 @@
         <import file="build.generated.xml"/>
     
         <!-- Main target -->
-        <target name="all" depends="spoofaximp.default"/>
+        <target name="all" depends="sdf2table,ppgen,pppack,stratego.aster,stratego.jar,sdf2imp,refresh"/>
     </project>

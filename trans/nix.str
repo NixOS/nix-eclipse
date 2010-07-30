@@ -14,14 +14,20 @@ rules // Main editor interface (defined by editor/Nix-Builders and -References.e
     with
       filename := <guarantee-extension(|"aterm")> path
 
+  generate-decorated-ast:
+    (selected, position, ast, path, project-path) -> (filename, <DecoratedAst>ast)
+    with
+      filename := <guarantee-extension(|"decorated.aterm")> path
+
 rules // import resolving  
   editor-resolve :	
 	(selected, position, ast, path, project-path) -> target
-	where
+	where 
 	  ast2 := <DecoratedAst>ast; 
       target := <decl-of> <term-at-position(|position)>ast2  
   
-  decl-of : Var(x) -> <VarDef>x		
+  decl-of : Var(x) -> <VarDef>x     
+  //decl-of : Id(x) -> <VarDef>x     
 	
   editor-resolve :
     (Path(p), position, ast, path, project-path) -> <parse-file> file
@@ -65,13 +71,17 @@ rules // analysis
 
   rename-bind : d@Inherit(xs) -> Inherit(ys)
     where
-      ys := < map(rename-bind-int(|d))>xs
+      ys := <map(rename-bind-int(|d))>xs
 
   rename-bind : d@InheritFrom(f, xs) -> InheritFrom(f, ys)
     where
-      ys := < map(rename-bind-int(|d))>xs
+      ys := <map(rename-bind-int(|d))>xs
   
   rename-bind : d@Arg(x) -> Arg(y)
+    where
+      y := <rename-bind-int(|d)>x
+            
+  rename-bind : d@ArgDefault(x,e) -> ArgDefault(y,e)
     where
       y := <rename-bind-int(|d)>x
             
@@ -86,6 +96,16 @@ rules // analysis
       
   rename : Var(x) -> Var(y)
     where y := <RenameId>x      
+
+//  rename : Id(x) -> Id(y)
+//    where y := <RenameId>x      
+  
+//  rename : Inherit(bs1) -> Inherit(bs2)
+//    where bs2 := <map(try(RenameId))>bs1 
+
+  rename : InheritFrom(f1, bs1) -> InheritFrom(f2, bs1)
+    where
+      f2 := <rename-top>f1 
       
   rename : RecAttributeSet(bs1) -> RecAttributeSet(bs3)
     where 
@@ -105,7 +125,6 @@ rules // analysis
   rename : d@Function(a1, e1) -> Function(a2, e2)
     where 
       {| RenameId:
-        <is-string>a1;
         a2 := <rename-bind-int(|d)>a1;
         e2 := <rename-top>e1
       |}

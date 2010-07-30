@@ -13,7 +13,7 @@ exports
     INT          -> Expr {cons("Int")}
     URI          -> Expr {cons("Uri")}
     PATH         -> Expr {cons("Path")}
-    
+
     "(" Expr ")"  -> Expr {bracket}
     "[" ExprList "]" -> Expr {cons("List")}
     -> ExprList {cons("ExprNil")}
@@ -48,6 +48,9 @@ exports
 
     StringSQ -> Expr
     StringDQ -> Expr
+    
+    "true"  -> Expr {cons("True")}
+    "false" -> Expr {cons("False")}
 
   syntax
     "\"" StringDQPart* StringDQEnd               -> <StringDQ-CF> {cons("StringDQ") }
@@ -113,7 +116,7 @@ exports
     PATHID* ("/" PATHID+)+ -> PATH
     [a-zA-Z] [a-zA-Z0-9\+\-\.]* ":" [a-zA-Z0-9\%\/\?\:\@\&\=\+\$\,\-\_\.\!\~\*\']+ -> URI
 
-    "rec" | "let" | "if" | "then" | "else" | "assert" | "with" | "inherit" -> ID {reject}
+    "rec" | "let" | "if" | "then" | "else" | "assert" | "with" | "inherit" | "true" | "false" -> ID {reject}
 
     -> EOF
 
@@ -128,7 +131,7 @@ exports
     
     %% EOF may not be followed by any char
     EOF           -/- ~[]
-    "rec" "let" "if" "then" "else" "assert" "with" "inherit" -/- [A-Za-z0-9\_\']
+    "rec" "let" "if" "then" "else" "assert" "with" "inherit" "true" "false" -/- [A-Za-z0-9\_\']
     
   lexical syntax
   	
@@ -165,7 +168,6 @@ exports
     "let" Bind* "in" Expr  -> Expr
     "if" Expr "then" Expr "else" Expr -> Expr
     "assert" Expr ";" Expr -> Expr
-%%    } > {
     ID ":" Expr                        -> Expr
     "{" {Arg ","}+ "}" ":" Expr        -> Expr
     ID "@" "{" {Arg ","}+ "}" ":" Expr -> Expr

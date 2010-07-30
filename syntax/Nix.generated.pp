@@ -35,6 +35,8 @@
    ArgEllipsis                 -- KW["..."],
    Select                      -- _1 KW["."] _2,
    If                          -- KW["if"] _1 KW["then"] _2 KW["else"] _3,
+   True                        -- KW["true"],
+   False                       -- KW["false"],
    Eq                          -- _1 KW["=="] _2,
    NEq                         -- _1 KW["!="] _2,
    Not                         -- KW["!"] _1,

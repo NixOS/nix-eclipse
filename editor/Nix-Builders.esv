@@ -7,9 +7,10 @@ builders
 
   observer : editor-analyze                                                          
 
-  provider : include/nix.ctree                                                       
+  provider : include/nix.jar                                                       
   
   builder  : "Show abstract syntax" = generate-aterm (openeditor) (realtime) (meta)  
+  builder  : "Show decorated abstract syntax" = generate-decorated-ast (openeditor) (realtime) (meta)  
   builder  : "Create missing file" = generate-missing-file (openeditor) (cursor)
   builder  : "Build attribute" = build-attribute (cursor)
   builder  : "Build top-level" = build-top-level (cursor)  
