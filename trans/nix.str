@@ -56,7 +56,7 @@ rules // analysis
     with
       errors   := <collect-all(nix-error(|path), conc)> ast; 
       warnings := <collect-all(nix-warning(|path), conc)> ast;
-      ast1     := <declare-top>ast;
+      ast1     := <declare-top>ast; 
       rules ( DecoratedAst : ast -> ast1 )
           
   declare-top =
@@ -125,6 +125,7 @@ rules // analysis
   rename : d@Function(a1, e1) -> Function(a2, e2)
     where 
       {| RenameId:
+      	is-string;
         a2 := <rename-bind-int(|d)>a1;
         e2 := <rename-top>e1
       |}
