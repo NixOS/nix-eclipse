@@ -1,0 +1,12 @@
+module Nix-Completions
+
+imports Nix-Completions.generated
+
+completions
+  completion proposer : editor-complete
+                                                                   
+  completion template : "import " <path> 
+  completion template : "inherit (" <e> ") " <i> ";"
+  completion template : "inherit " <i> ";"
+  completion template : "fetchurl {\n\turl = " <url> ";\n\tsha256sum = \"\";\n};"
+  // completion template  : <name> " = import " <path> " {\n\t\n};"

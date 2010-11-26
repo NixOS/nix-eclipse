@@ -1,0 +1,16 @@
+module Nix.main
+
+imports Nix-Builders Nix-Colorer Nix-Completions Nix-Folding Nix-Outliner Nix-References Nix-Syntax
+
+language General properties
+                  
+  name          : Nix
+  id            : Nix
+  extends       : Root
+                  
+  description   : "Spoofax/IMP-generated editor for the Nix language"
+  url           : http://strategoxt.org
+                  
+  extensions    : nix
+  table         : include/Nix.tbl
+  start symbols : Expr
