@@ -19,8 +19,11 @@ rules // Main editor interface (defined by editor/Nix-Builders and -References.e
     with
       filename := <guarantee-extension(|"decorated.aterm")> path
 
-rules // import resolving  
-  editor-resolve :	
+rules // import resolving
+  
+  editor-resolve = editor-resolve-decl <+ editor-resolve-path <+ editor-resolve-fallback  
+    
+  editor-resolve-decl :	
 	(selected, position, ast, path, project-path) -> target
 	where 
 	  ast2 := <DecoratedAst>ast; 
@@ -29,10 +32,15 @@ rules // import resolving
   decl-of : Var(x) -> <VarDef>x     
   //decl-of : Id(x) -> <VarDef>x     
 	
-  editor-resolve :
+  editor-resolve-path :
     (Path(p), position, ast, path, project-path) -> <parse-file> file
-    with
+    where
       file := <resolve-import-path(|path)> p
+
+  editor-resolve-fallback :
+    (t, position, ast, path, project-path) -> <parse-file> file
+    where
+      <oncetd(?Path(p))>t ; file := <resolve-import-path(|path)> p
 
   resolve-path(|basepath) =
   	?p
