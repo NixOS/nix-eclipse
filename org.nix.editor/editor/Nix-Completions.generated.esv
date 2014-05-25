@@ -17,11 +17,16 @@ completions
   //                                                                                      
   //   completion template: "section " <title> "\n\t" (blank)                             
   //                                                                                      
-  // Finally, you can specify a specific SDF sort for which a completion                  
+  // You can specify a specific SDF sort for which a completion                           
   // rule should trigger as follows:                                                      
   //                                                                                      
-  //   completion template : Section =                                                    
+  //   completion template Section :                                                      
   //     "section " <title> "\n\t" (blank)                                                
+  //                                                                                      
+  // Finally, you can override the prefix of the completion:                              
+  //                                                                                      
+  //   completion template Statement : "assignment" =                                     
+  //     <x> " = " <y> (blank)                                                            
   //                                                                                      
   // Semantic content completion can be defined as follows:                               
   //                                                                                      

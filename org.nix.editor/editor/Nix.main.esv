@@ -1,16 +1,31 @@
 module Nix.main
 
-imports Nix-Builders Nix-Colorer Nix-Completions Nix-Folding Nix-Outliner Nix-References Nix-Syntax
+imports
+  Nix-Colorer
+  Nix-Completions
+  Nix-Folding
+  Nix-Menus
+  Nix-Refactorings
+  Nix-References
+  Nix-Syntax
+  Nix-Views
 
 language General properties
-                  
-  name          : Nix
-  id            : Nix
-  extends       : Root
-                  
-  description   : "Spoofax/IMP-generated editor for the Nix language"
-  url           : http://strategoxt.org
-                  
-  extensions    : nix
-  table         : include/Nix.tbl
-  start symbols : Expr
+  
+  name:          Nix
+  id:            org.nix.editor
+  extends:       Root
+  
+  description:   "Spoofax/IMP-generated editor for the Nix language"
+  url:           https://nixos.org/nix/
+  
+  extensions:    nix
+  table:         include/Nix.tbl
+  start symbols: Expr
+  
+  provider:      include/nix.ctree
+  provider:      include/nix-java.jar
+  
+  observer:      editor-analyze (multifile)
+  
+  on save:       editor-save

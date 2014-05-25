@@ -1,4 +1,4 @@
-package Nix;
+package org.nix.editor;
 
 import org.strategoxt.imp.runtime.dynamicloading.Descriptor;
 import org.strategoxt.imp.runtime.services.MetaFileLanguageValidator;

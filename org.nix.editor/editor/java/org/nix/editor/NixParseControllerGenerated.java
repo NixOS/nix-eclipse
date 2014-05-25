@@ -1,7 +1,10 @@
-package Nix;
+package org.nix.editor;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.imp.parser.IParseController;
 import org.strategoxt.imp.runtime.Environment;
 import org.strategoxt.imp.runtime.dynamicloading.BadDescriptorException;
@@ -9,7 +12,7 @@ import org.strategoxt.imp.runtime.dynamicloading.Descriptor;
 import org.strategoxt.imp.runtime.dynamicloading.DescriptorFactory;
 import org.strategoxt.imp.runtime.dynamicloading.DynamicParseController;
 
-public class NixParseController extends DynamicParseController 
+public class NixParseControllerGenerated extends DynamicParseController 
 { 
   public static final String LANGUAGE = new String("Nix");
 
@@ -30,18 +33,34 @@ public class NixParseController extends DynamicParseController
     return descriptor;
   }
 
-  private static void createDescriptor()
+  protected static synchronized void setDescriptor(Descriptor descriptor)
+  { 
+    NixParseControllerGenerated.descriptor = descriptor;
+  }
+
+  protected static void createDescriptor()
   { 
     try
     { 
-      InputStream descriptorStream = NixParseController.class.getResourceAsStream(DESCRIPTOR);
-      InputStream table = NixParseController.class.getResourceAsStream(TABLE);
+      InputStream descriptorStream = NixParseControllerGenerated.class.getResourceAsStream(DESCRIPTOR);
+      InputStream table = NixParseControllerGenerated.class.getResourceAsStream(TABLE);
+      boolean filesystem = false;
+      if(descriptorStream == null && new File("./" + DESCRIPTOR).exists())
+      { 
+        descriptorStream = new FileInputStream("./" + DESCRIPTOR);
+        filesystem = true;
+      }
+      if(table == null && new File("./" + TABLE).exists())
+      { 
+        table = new FileInputStream("./" + TABLE);
+        filesystem = true;
+      }
       if(descriptorStream == null)
         throw new BadDescriptorException("Could not load descriptor file from " + DESCRIPTOR + " (not found in plugin: " + getPluginLocation() + ")");
       if(table == null)
         throw new BadDescriptorException("Could not load parse table from " + TABLE + " (not found in plugin: " + getPluginLocation() + ")");
-      descriptor = DescriptorFactory.load(descriptorStream, table, null);
-      descriptor.setAttachmentProvider(NixParseController.class);
+      descriptor = DescriptorFactory.load(descriptorStream, table, filesystem ? Path.fromPortableString("./") : null);
+      descriptor.setAttachmentProvider(NixParseControllerGenerated.class);
     }
     catch(BadDescriptorException exc)
     { 
