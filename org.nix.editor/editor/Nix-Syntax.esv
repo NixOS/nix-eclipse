@@ -1,7 +1,9 @@
 module Nix-Syntax
 
+imports Nix-Syntax.generated
+
 language
-                                                                   
+                                                                  
   // Comment constructs:                   
   line comment                           : "#"
   block comment                          : "/*" * "*/"

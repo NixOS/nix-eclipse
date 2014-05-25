@@ -1,12 +1,24 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
-
 <plugin>
-       <extension point="org.eclipse.imp.runtime.languageDescription">
-          <language extensions="nix" description="Nix" language="Nix" derivedFrom="DynamicRoot" validator="Nix.NixValidator" validatorClass="Nix.NixValidator"></language>
-       </extension>
-       <extension id="Nix.parser" name="Nix Parser" point="org.eclipse.imp.runtime.parser">
-          <parser class="Nix.NixParseController" language="Nix">
-          </parser>
-       </extension>    
-    </plugin>
+   <extension
+         point="org.eclipse.imp.runtime.languageDescription">
+      <language
+            extensions="nix"
+            description="Nix"
+            language="Nix"
+            derivedFrom="DynamicRoot"
+            validator="org.nix.editor.NixValidator"
+            validatorClass="org.nix.editor.NixValidator"
+      ></language>
+   </extension>
+   <extension
+         id="org.nix.editor.parser"
+         name="Nix Parser"
+         point="org.eclipse.imp.runtime.parser">
+      <parser
+            class="org.nix.editor.NixParseController"
+            language="Nix">
+      </parser>
+   </extension>    
+</plugin>

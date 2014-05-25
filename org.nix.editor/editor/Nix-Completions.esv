@@ -3,7 +3,11 @@ module Nix-Completions
 imports Nix-Completions.generated
 
 completions
-  completion proposer : editor-complete
+  // Semantic (identifier) completion:   
+                                         
+  completion proposer                  : editor-complete
+                                         
+  //completion trigger                   : "."
                                                                    
   completion template : "import " <path> 
   completion template : "inherit (" <e> ") " <i> ";"

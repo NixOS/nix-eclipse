@@ -2,7 +2,6 @@ module Nix-References
 
 imports Nix-References.generated
 
-
 references
                                                                                                    
   // This file can be used to specify reference resolving and hover help, and content completion.  
@@ -11,11 +10,6 @@ references
                                                                                                    
 
 references
-               
+                
   reference _ : editor-resolve
-
-/*
-
-  hover _     : editor-hover
-  
-*/
+  //hover _     : editor-hover

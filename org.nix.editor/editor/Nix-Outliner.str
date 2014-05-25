@@ -1,0 +1,13 @@
+module editor/Nix-Outliner
+
+imports
+  
+  include/Nix
+  lib/runtime/editor/outline-library
+  lib/runtime/editor/origins
+  editor/Nix-Outliner.generated
+
+rules
+  
+  to-outline-label = fail
+  

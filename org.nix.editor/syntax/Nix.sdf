@@ -1,5 +1,4 @@
 %% Grammar for the Nix language
-%% By default, based on an example "entities" syntax
 module Nix
 exports
 

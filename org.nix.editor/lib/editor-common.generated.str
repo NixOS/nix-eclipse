@@ -32,6 +32,8 @@ strategies
     ast2abox(|[<import-term(include/Nix.generated.pp.af)>,
                <import-term(include/Nix.pp.af)>]);
     box2text-string(|100)
+    
+  language = !"Nix"
 
 strategies
   
@@ -125,11 +127,21 @@ strategies
   
   origin-term      = prim("SSL_EXT_origin_term", <id>)
   origin-text      = prim("SSL_EXT_origin_text", <id>)
+  origin-offset    = prim("SSL_EXT_origin_offset", <id>)
   origin-location  = prim("SSL_EXT_origin_location", <id>)
   origin-line      = origin-location => (<id>, _, _, _)
   origin-column    = origin-location => (_, <id>, _, _)
+  origin-file      = prim("SSL_EXT_origin_file", <id>)
   origin-strip     = prim("SSL_EXT_origin_strip", <id>)
   origin-equal(|t) = prim("SSL_EXT_origin_equal", <id>, t)
+
+  origin-language-description =
+    prim("SSL_EXT_languagedescription", <id>)
+
+  origin-language =
+    origin-file; 
+    origin-language-description;
+    Fst
   
   origin-surrounding-comments =
     prim("SSL_EXT_origin_surrounding_comments", "Nix", <id>)
@@ -143,8 +155,15 @@ strategies
     ['*' | c*] -> <ltrim(' ' + '\t' + '\n' + '\r')> c*
   
   origin-track-forced(s) =
-    !Some(<id>); all(s); ?Some(<id>)
+    ![<id>]; all(s); ?[<id>]
 
+  origin-relative-path:
+    trm -> rel-path
+    where
+      full-path := <origin-file> trm;
+      len-project-prefix := <project-path; string-length; inc>;
+      rel-path := <string-as-chars(drop(|len-project-prefix))> full-path
+      
 strategies
 
   desugar-position(desugar|ast):
@@ -168,12 +187,14 @@ strategies
       t' := <s> t
 
   position-of-term(is-term):
+    _#(t*) -> <position-of-term(is-term|0)> t*
+    where
+      not(is-term)
+
+  position-of-term(is-term):
     t -> []
     where
       is-term
-  
-  position-of-term(is-term):
-    _#(t*) -> <position-of-term(is-term|0)> t*
   
   position-of-term(is-term|start-index):
     [t | t*] -> position
@@ -203,23 +224,13 @@ strategies
 
   subterm-at(|index):
     _#(t*) -> <index(|<inc> index)> t*
-  
+
 signature constructors
 
   COMPLETION : String -> Term
   NOCONTEXT  : Term   -> Term
   MARKER     : Term
-
-  // Below are copies of the signatures of the terms used in example
-  // trans/nix.str file. These definitions should also be automatically 
-  // generated in the imported include/Nix.str module. However,
-  // to ensure that the example transformation doesn't break when the
-  // syntax is changed, we also hard-coded them here.
-          
-  Module   : ID * List(Entity)   -> Module
-  Entity   : ID * List(Property) -> Entity
-  Property : ID * Type           -> Property
-  Type     : ID                  -> Type
+  True       : Term
 
 strategies
   
@@ -233,6 +244,10 @@ strategies
   queue-analysis = 
        (is-list; list-loop(queue-analysis))
     <+ prim("SSL_EXT_queue_analysis")
+    
+  // Gets the number of background analyses for currenct project and language.
+  // Current term: ignored
+  analysis-count = prim("SSL_EXT_queue_analysis_count")
 
   // Set the total number of work units to complete. Can be called multiple times. 
   // Current term: number of work units (int).
